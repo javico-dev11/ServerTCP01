@@ -33,6 +33,8 @@
             this.refreshButton = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
             this.lblClientes = new System.Windows.Forms.Label();
+            this.serverText = new System.Windows.Forms.TextBox();
+            this.button1 = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // clientsListBox
@@ -67,7 +69,7 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(401, 394);
+            this.label1.Location = new System.Drawing.Point(401, 401);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(132, 16);
             this.label1.TabIndex = 3;
@@ -77,17 +79,37 @@
             // 
             this.lblClientes.AutoSize = true;
             this.lblClientes.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(192)))), ((int)(((byte)(0)))));
-            this.lblClientes.Location = new System.Drawing.Point(553, 394);
+            this.lblClientes.Location = new System.Drawing.Point(553, 401);
             this.lblClientes.Name = "lblClientes";
             this.lblClientes.Size = new System.Drawing.Size(14, 16);
             this.lblClientes.TabIndex = 4;
             this.lblClientes.Text = "0";
             // 
+            // serverText
+            // 
+            this.serverText.Location = new System.Drawing.Point(12, 398);
+            this.serverText.Name = "serverText";
+            this.serverText.Size = new System.Drawing.Size(179, 22);
+            this.serverText.TabIndex = 5;
+            this.serverText.Text = "192.168.100.89";
+            // 
+            // button1
+            // 
+            this.button1.Location = new System.Drawing.Point(206, 394);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(91, 30);
+            this.button1.TabIndex = 6;
+            this.button1.Text = "Empezar";
+            this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.button1_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(583, 420);
+            this.ClientSize = new System.Drawing.Size(583, 432);
+            this.Controls.Add(this.button1);
+            this.Controls.Add(this.serverText);
             this.Controls.Add(this.lblClientes);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.refreshButton);
@@ -108,6 +130,8 @@
         private System.Windows.Forms.Button refreshButton;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label lblClientes;
+        private System.Windows.Forms.TextBox serverText;
+        private System.Windows.Forms.Button button1;
     }
 }
 

@@ -16,19 +16,15 @@ namespace ServerTCP01
     public partial class Form1 : Form
     {
         private TcpListener listener;
-        private readonly Task listenTask;
-        private readonly StringBuilder logBuilder = new StringBuilder();
+        private  Task listenTask;
+        private  StringBuilder logBuilder = new StringBuilder();
         private int countClients = 0;
 
         public Form1()
         {
             InitializeComponent();
 
-            // Inicia el servidor en un hilo separado
-            IPAddress ip = IPAddress.Parse("192.168.100.89");
-            int port = 8080;
-            listener = new TcpListener(ip, port);
-            listenTask = Task.Run(() => ListenForClients());
+            
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -130,5 +126,37 @@ namespace ServerTCP01
             logTextBox.Text = logBuilder.ToString();
         }
 
+        private void button1_Click(object sender, EventArgs e)
+        {
+            if (button1.Text == "Empezar")
+            {
+                button1.Text = "Detener";
+
+                if (serverText.Text != "")
+                {
+                    button1.Enabled = false;
+                    serverText.Enabled = false;
+                    // Inicia el servidor en un hilo separado
+                    IPAddress ip = IPAddress.Parse(serverText.Text);
+                    int port = 8080;
+                    listener = new TcpListener(ip, port);
+                    listenTask = Task.Run(() => ListenForClients());
+                }
+                else
+                {
+                    MessageBox.Show("Por favor ingrese la dirección IP del servidor a iniciar!...");
+                    serverText.Focus();
+                    serverText.Enabled = true;
+                    button1.Enabled = true;
+                }
+            } 
+            else if (button1.Text == "Detener")
+            {
+                button1.Text = "Empezar";
+                serverText.Enabled = true;
+            }
+
+            
+        }
     }
 }
