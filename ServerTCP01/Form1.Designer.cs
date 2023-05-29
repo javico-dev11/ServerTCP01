@@ -71,7 +71,7 @@
             this.label1.AutoSize = true;
             this.label1.Location = new System.Drawing.Point(401, 401);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(132, 16);
+            this.label1.Size = new System.Drawing.Size(139, 17);
             this.label1.TabIndex = 3;
             this.label1.Text = "Clientes conectados:";
             // 
@@ -81,7 +81,7 @@
             this.lblClientes.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(192)))), ((int)(((byte)(0)))));
             this.lblClientes.Location = new System.Drawing.Point(553, 401);
             this.lblClientes.Name = "lblClientes";
-            this.lblClientes.Size = new System.Drawing.Size(14, 16);
+            this.lblClientes.Size = new System.Drawing.Size(16, 17);
             this.lblClientes.TabIndex = 4;
             this.lblClientes.Text = "0";
             // 
@@ -91,7 +91,7 @@
             this.serverText.Name = "serverText";
             this.serverText.Size = new System.Drawing.Size(179, 22);
             this.serverText.TabIndex = 5;
-            this.serverText.Text = "192.168.100.89";
+            this.serverText.Text = "239.0.0.1";
             // 
             // button1
             // 
@@ -116,7 +116,7 @@
             this.Controls.Add(this.logTextBox);
             this.Controls.Add(this.clientsListBox);
             this.Name = "Form1";
-            this.Text = "Servidor: Sistemas Distribuidos Grupo-003";
+            this.Text = "Servidor: Multicast - Grupo-003";
             this.Load += new System.EventHandler(this.Form1_Load);
             this.ResumeLayout(false);
             this.PerformLayout();

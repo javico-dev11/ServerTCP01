@@ -15,30 +15,34 @@ using System.Windows.Forms;
 
 namespace ClientTCP01
 {
+
     public partial class Form1 : Form
     {
-        private TcpClient client;
-        private NetworkStream stream;
+        private UdpClient udpClient;
+        private string multicastAddress;
+        private int multicastPort;
         private string myIp;
 
         public Form1()
         {
-
             InitializeComponent();
-            getIpLocal();
+            GetLocalIPAddress();
         }
 
-        private void getIpLocal()
+        private void Form1_Load(object sender, EventArgs e)
+        {
+
+        }
+
+        private void GetLocalIPAddress()
         {
             try
             {
-                // Obtener la dirección IP local
                 string hostname = Dns.GetHostName();
                 IPHostEntry hostEntry = Dns.GetHostEntry(hostname);
                 IPAddress[] ipAddressList = hostEntry.AddressList;
                 IPAddress localIPAddress = null;
 
-                // Buscar la primera dirección IP de la lista que no sea una dirección IP de loopback
                 foreach (IPAddress ipAddress in ipAddressList)
                 {
                     if (!IPAddress.IsLoopback(ipAddress) && ipAddress.AddressFamily == AddressFamily.InterNetwork)
@@ -68,50 +72,27 @@ namespace ClientTCP01
             }
         }
 
-        private bool pingToServer()
-        {
-            bool pingable = false;
-            Ping pinger = null;
-
-            try
-            {
-                pinger = new Ping();
-                PingReply reply = pinger.Send(txtServer.Text);
-                pingable = reply.Status == IPStatus.Success;
-            }
-            catch (PingException ex)
-            {
-                Console.WriteLine($"Ocurrió un error al intentar hacer un ping al servidor: {ex.Message}");
-                logTextBox.AppendText("Ocurrió un error al intentar hacer un ping al servidor!." + Environment.NewLine);
-            }
-            finally
-            {
-                if (pinger != null)
-                {
-                    pinger.Dispose();
-                }
-            }
-
-            return pingable;
-        }
-
         private void connectButton_Click(object sender, EventArgs e)
         {
             try
             {
-                // Conecta con el servidor
-                client = new TcpClient(txtServer.Text, 8080);
-                stream = client.GetStream();
-                
-                // Agrega un controlador de eventos para recibir mensajes del servidor
-                byte[] buffer = new byte[1024];
-                stream.BeginRead(buffer, 0, buffer.Length, new AsyncCallback(ReceiveCallback), buffer);
+                // Conecta con el servidor multicast
+                multicastAddress = txtServer.Text;
+                multicastPort = 8080;
+                udpClient = new UdpClient();
+                udpClient.Client.Bind(new IPEndPoint(IPAddress.Any, multicastPort));
+                udpClient.JoinMulticastGroup(IPAddress.Parse(multicastAddress));
 
-                logTextBox.AppendText("Conectado al servidor TCP" + Environment.NewLine);
+                // Inicia un hilo separado para recibir mensajes del servidor multicast
+                Task.Run(() => ReceiveMessages());
+
+                logTextBox.AppendText("Conectado al servidor multicast" + Environment.NewLine);
+                connectButton.Enabled = false;
+                txtServer.Enabled = false;
             }
             catch (Exception ex)
             {
-                logTextBox.AppendText("Error al conectar con el servidor: " + ex.Message + Environment.NewLine);
+                logTextBox.AppendText("Error al conectar con el servidor multicast: " + ex.Message + Environment.NewLine);
             }
         }
 
@@ -119,71 +100,68 @@ namespace ClientTCP01
         {
             try
             {
-                // Envía un mensaje al servidor
+                // Envía un mensaje al servidor multicast
                 string message = messageTextBox.Text;
                 byte[] data = Encoding.ASCII.GetBytes(message);
-                stream.Write(data, 0, data.Length);
+                udpClient.Send(data, data.Length, multicastAddress, multicastPort);
 
                 // Borra el contenido del cuadro de texto del mensaje
                 messageTextBox.Text = "";
 
-                logTextBox.AppendText("Mensaje enviado al servidor: " + message + Environment.NewLine);
+                //logTextBox.AppendText("Mensaje enviado al servidor multicast: " + message + Environment.NewLine);
             }
             catch (Exception ex)
             {
-                logTextBox.AppendText("Error al enviar el mensaje al servidor: " + ex.Message + Environment.NewLine);
+                logTextBox.AppendText("Error al enviar el mensaje al servidor multicast: " + ex.Message + Environment.NewLine);
             }
         }
 
-        private void ReceiveCallback(IAsyncResult ar)
+        private void ReceiveMessages()
         {
             try
             {
-                // Obtiene los datos del servidor
-                byte[] buffer = (byte[])ar.AsyncState;
-                int bytesRead = stream.EndRead(ar);
-                string message = Encoding.ASCII.GetString(buffer, 0, bytesRead);
-
-                // Muestra el mensaje recibido en el cuadro de texto de registro
-                Invoke((MethodInvoker)delegate
+                while (true)
                 {
-                    logTextBox.AppendText("Mensaje recibido del servidor: " + message + Environment.NewLine);
-                });
+                    IPEndPoint remoteEndPoint = null;
+                    byte[] receivedData = udpClient.Receive(ref remoteEndPoint);
+                    string message = Encoding.ASCII.GetString(receivedData);
 
-                // Inicia una nueva lectura de datos del servidor
-                stream.BeginRead(buffer, 0, buffer.Length, new AsyncCallback(ReceiveCallback), buffer);
+                    // Muestra el mensaje recibido en el cuadro de texto de registro
+                    Invoke((MethodInvoker)delegate
+                    {
+                        // Verifica si el mensaje es del mismo cliente
+                        if (remoteEndPoint.Address.ToString() == myIp && remoteEndPoint.Port == ((IPEndPoint)udpClient.Client.LocalEndPoint).Port)
+                        {
+                            logTextBox.AppendText($"Yo => " + message + Environment.NewLine);
+                        }
+                        else
+                        {
+                            logTextBox.AppendText($"Mensaje recibido de: {remoteEndPoint.Address} => " + message + Environment.NewLine);
+                        }
+
+                        
+                    });
+                }
             }
             catch (Exception ex)
             {
-                logTextBox.AppendText("Error al recibir el mensaje del servidor: " + ex.Message + Environment.NewLine);
+                logTextBox.AppendText("Error al recibir el mensaje del servidor multicast: " + ex.Message + Environment.NewLine);
             }
         }
-
 
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
         {
-            // Cierra la conexión con el servidor
-            if (client != null)
-            {
-                client.Close();
-            }
-        }
-
-        private void Form1_Load(object sender, EventArgs e)
-        {
-
+            // Cierra la conexión con el servidor multicast
+            udpClient?.DropMulticastGroup(IPAddress.Parse(multicastAddress));
+            udpClient?.Close();
         }
 
         private void pingButton_Click(object sender, EventArgs e)
         {
-            if (pingToServer())
-            {
-                logTextBox.AppendText("PING al servidor exitoso!." + Environment.NewLine);
-            }
-            else
-            {
-                logTextBox.AppendText("PING al servidor no exitoso!." + Environment.NewLine);
-            }
+            // No se puede realizar un ping a un servidor multicast, por lo que esta función no es aplicable en este caso
+            logTextBox.AppendText("Esta función no es aplicable para un servidor multicast." + Environment.NewLine);
         }
     }
+
+
 }

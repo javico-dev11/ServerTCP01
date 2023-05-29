@@ -67,7 +67,7 @@
             this.label1.AutoSize = true;
             this.label1.Location = new System.Drawing.Point(12, 7);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(76, 20);
+            this.label1.Size = new System.Drawing.Size(65, 17);
             this.label1.TabIndex = 3;
             this.label1.Text = "Servidor:";
             // 
@@ -94,12 +94,13 @@
             this.label2.AutoSize = true;
             this.label2.Location = new System.Drawing.Point(12, 106);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(33, 16);
+            this.label2.Size = new System.Drawing.Size(36, 17);
             this.label2.TabIndex = 6;
             this.label2.Text = "Log:";
             // 
             // pingButton
             // 
+            this.pingButton.Enabled = false;
             this.pingButton.Location = new System.Drawing.Point(409, 22);
             this.pingButton.Name = "pingButton";
             this.pingButton.Size = new System.Drawing.Size(71, 32);
@@ -122,7 +123,7 @@
             this.Controls.Add(this.messageTextBox);
             this.Controls.Add(this.sendButton);
             this.Name = "Form1";
-            this.Text = "Cliente: Sistemas Distribuidos Grupo-003";
+            this.Text = "Cliente: Multicast - Grupo-003";
             this.Load += new System.EventHandler(this.Form1_Load);
             this.ResumeLayout(false);
             this.PerformLayout();
